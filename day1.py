@@ -14,14 +14,14 @@ def puzzle1(data):
 def puzzle2(data):
     ans = False
     current = 0
-    deltas = data
     freqs = []
 
-    numdeltas = len(deltas)
+    dataCount = len(data)
     index = 0
     while not ans and index < 1000000:  # We should find it within 1 million checks, riiiight?
-        current += deltas[index % numdeltas]
+        current += data[index % dataCount]
         # This check isn't very performant but I can't be bothered to improve it
+        # See puzzle2_faster for the very simple improvement...
         if current in freqs:
             ans = current
         else:
@@ -34,13 +34,12 @@ def puzzle2(data):
 def puzzle2_faster(data):
     ans = False
     current = 0
-    deltas = data
     freqs = set()
 
-    numdeltas = len(deltas)
+    dataCount = len(data)
     index = 0
     while not ans and index < 1000000:  # We should find it within 1 million checks, riiiight?
-        current += deltas[index % numdeltas]
+        current += data[index % dataCount]
         # This test is much faster for sets than lists
         if current in freqs:
             ans = current
