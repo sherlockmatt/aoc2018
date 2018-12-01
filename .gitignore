@@ -1,3 +1,8 @@
+#################################################
+# Ignore the file containing the session cookie #
+#################################################
+session.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
