@@ -7,14 +7,14 @@ def getData():
     return list(map((lambda x: int(x)), r.iter_lines()))
 
 
-def puzzle1():
-    print('Answer is: {}'.format(reduce((lambda x, y: x + y), getData())))
+def puzzle1(data):
+    print('Answer is: {}'.format(reduce((lambda x, y: x + y), data)))
 
 
-def puzzle2():
+def puzzle2(data):
     ans = False
     current = 0
-    deltas = getData()
+    deltas = data
     freqs = []
 
     numdeltas = len(deltas)
@@ -31,10 +31,10 @@ def puzzle2():
     print('Answer is: {}, found at index: {}'.format(ans, index))
 
 
-def puzzle2_faster():
+def puzzle2_faster(data):
     ans = False
     current = 0
-    deltas = getData()
+    deltas = data
     freqs = set()
 
     numdeltas = len(deltas)
@@ -52,5 +52,6 @@ def puzzle2_faster():
 
 
 if __name__ == '__main__':
-    puzzle1()
-    puzzle2_faster()
+    inputData = getData()
+    puzzle1(inputData)
+    puzzle2_faster(inputData)
