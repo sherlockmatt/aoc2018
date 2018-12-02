@@ -23,7 +23,7 @@ def puzzle1(data):
 
 def puzzle2(data):
     # Process the data into a list of strings
-    data = list(map((lambda x: str(x)), data))
+    data = list(map((lambda x: x.decode()), data))
     dataLength = len(data)
     # Assume all the strings are the same length
     # Pretty safe assumption, the test is pointless if they aren't
