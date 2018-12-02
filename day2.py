@@ -1,4 +1,7 @@
 from helpers import download
+import numpy as np
+from numpy.core import defchararray as npc
+from functools import reduce
 
 
 def getData():
@@ -53,7 +56,12 @@ def puzzle2(data):
     print('Answer: {}'.format(ans))
 
 
+def puzzle2_oneline(d):
+    return [np.delete(x, np.nonzero(npc.not_equal(x, y))) for x in d for y in d if np.count_nonzero(npc.not_equal(x, y)) == 1][0]
+
+
 if __name__ == '__main__':
     inputData = getData()
     puzzle1(inputData)
     puzzle2(inputData)
+    print('Answer: {}'.format(reduce((lambda x, y: x + y), puzzle2_oneline(list(map((lambda x: [y for y in x.decode()]), inputData))))))
