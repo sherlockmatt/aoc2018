@@ -7,11 +7,11 @@ def getData():
 
 
 def puzzle1(data):
-    print('Answer: {}'.format(data))
+    print('Answer: {}'.format(''))
 
 
 def puzzle2(data):
-    print('Answer: {}'.format(data))
+    print('Answer: {}'.format(''))
 
 
 if __name__ == '__main__':
