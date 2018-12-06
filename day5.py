@@ -26,7 +26,7 @@ def puzzle1(data):
 
 def puzzle2(data):
     # For each character a-z, remove all instances of it, run puzzle1() again to react the new string, then take the shortest result
-    print('Answer: {}'.format(reduce(min, [puzzle1(np.delete(data, np.append(np.argwhere(data == a), np.argwhere(data == a + 32)))).shape[0] for a in range(b'A'[0], b'Z'[0] + 1)])))
+    print('Answer: {}'.format(reduce(min, [puzzle1(np.delete(data, np.argwhere(abs(data - (a + 16)) == 16))).shape[0] for a in range(b'A'[0], b'Z'[0] + 1)])))
 
 
 if __name__ == '__main__':
