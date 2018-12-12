@@ -1,5 +1,8 @@
 from helpers import download
 import numpy as np
+from numba import njit, prange
+
+padding = [False, False, False, False]
 
 
 def getData():
@@ -7,54 +10,70 @@ def getData():
     iterlines = r.iter_lines()
 
     # Prepend and append some padding to allow the 5-wide window tests
-    initialState = [False, False, False, False] + [x == b'#'[0] for x in iterlines.__next__()[15:]] + [False, False, False, False]
+    initialState = padding + [x == b'#'[0] for x in iterlines.__next__()[15:]] + padding
     # Skip the empty line in the input
     _ = iterlines.__next__()
 
     rules = []
     for line in iterlines:
-        rule = [x == b'#'[0] for x in line[0:5]]
-        result = line[9] == b'#'[0]
-        rules.append((rule, result))
+        # Only store the rules which grow plants
+        if line[9] == b'#'[0]:
+            rule = 0
+            for x in line[0:5]:
+                rule = rule << 1
+                rule += x == b'#'[0]
+            rules.append(rule)
 
-    return initialState, np.array(rules)
+    return np.array(initialState, dtype=np.bool), np.array(rules, dtype=np.uint8)
+
+
+@njit(parallel=True)
+def calcNewState(currentState, newState, rules):
+    # Calculate all available windows of 5 pots in parallel
+    for i in prange(2, len(currentState) - 3):
+        window = 0
+        for x in currentState[i - 2:i + 3]:
+            window = window << 1
+            window += x
+
+        # If the window matches any of the rules, grow a plant, if none match don't grow one
+        newState[i] = np.equal(rules, window).any()
 
 
 def calculateTotalPotValue(initialState, rules, generations):
     # Array index 0 is actually pot number -4 at the start, thanks to the padding
     shift = -4
-    currentState = np.array(initialState)
+    lastShift = shift
+    currentState = initialState.copy()
     gen = 0
     converged = False
     while not converged and gen < generations:
         # Start the new state with some padding
-        newState = [False, False]
+        newState = np.array([False for _ in range(len(currentState))], dtype=np.bool)
+        calcNewState(currentState, newState, rules)
 
-        # Calculate all available windows of 5 pots
-        for i in range(2, len(currentState) - 3):
-            matched = False
-            j = -1
-            # Check for a rule which matches
-            while not matched and j < len(rules) - 1:
-                j += 1
-                # If any of the positions are different from the rule, it's not a match
-                matched = not np.bitwise_xor(currentState[i - 2:i + 3], rules[j][0]).any()
-            newState.append(rules[j][1] if matched else False)
+        # Calculate how much to trim the array (remove False values on the ends)
+        start = 0
+        while not newState[start]:
+            start += 1
+        end = len(newState) - 1
+        while not newState[end]:
+            end -= 1
 
-        # Expand the padding if required
-        prependVal = [False for x in newState[2:4] if x]
-        appendVal = [False for x in newState[-2:] if x]
-        newState = prependVal + newState + appendVal + [False, False]
+        # Execute the trim and add padding on both ends
+        newState = np.array(np.append(padding, np.append(newState[start:end + 1], padding)), dtype=np.bool)
 
-        # If our padding grew into the negatives, update the index shift
-        shift -= len(prependVal)
+        # Adjust the shift for the trimming and padding
+        shift += start - 4
 
-        # Check for convergence (i.e. the same pattern moving right one pot)
-        if len(prependVal) == 0 and len(appendVal) > 0 and np.equal(currentState, newState[1:]).all():
+        # Check for convergence i.e. the same pattern we saw last generation
+        if len(currentState) == len(newState) and np.array_equal(currentState, newState):
             converged = True
-            shift += generations - gen - 1
+            # Simulate the array "moving" for the remainder of the generations, at the current speed
+            shift += (generations - gen - 1) * (shift - lastShift)
 
-        currentState = np.array(newState)
+        currentState = newState
+        lastShift = shift
         gen += 1
 
     print('Answer: {}'.format(sum([i + shift for i, v in enumerate(currentState) if v])))
