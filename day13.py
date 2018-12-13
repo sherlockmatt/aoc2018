@@ -34,31 +34,34 @@ def getData():
     return np.array(track), carts
 
 
-def printTrackAndCarts(track, carts):
+def printTrackAndCarts(track, carts, crashed=[]):
     for y, line in enumerate(track):
         output = ''
         for x, pos in enumerate(line):
             i = indexOfCartAtPos((x, y), carts)
             if i > -1:
-                cart = carts[i]
-                if cart['dirx'] == 1 and cart['diry'] == 0:
-                    output += '>'
-                elif cart['dirx'] == 0 and cart['diry'] == -1:
-                    output += 'v'
-                elif cart['dirx'] == -1 and cart['diry'] == 0:
-                    output += '<'
-                elif cart['dirx'] == 0 and cart['diry'] == 1:
-                    output += '^'
+                if i in crashed:
+                    output += 'X'
                 else:
-                    output += '?'
+                    cart = carts[i]
+                    if cart['dirx'] == 1 and cart['diry'] == 0:
+                        output += '>'
+                    elif cart['dirx'] == 0 and cart['diry'] == -1:
+                        output += 'v'
+                    elif cart['dirx'] == -1 and cart['diry'] == 0:
+                        output += '<'
+                    elif cart['dirx'] == 0 and cart['diry'] == 1:
+                        output += '^'
+                    else:
+                        output += '?'
             else:
                 output += track[y][x]
         print(output)
 
 
-def indexOfCartAtPos(pos, carts):
+def indexOfCartAtPos(pos, carts, crashed=[]):
     for i, cart in enumerate(carts):
-        if pos[0] == cart[0] and pos[1] == cart[1]:
+        if i not in crashed and pos[0] == cart[0] and pos[1] == cart[1]:
             return i
     return -1
 
@@ -82,7 +85,7 @@ def simulateCarts(track_in, carts_in, stopOnFirstCrash):
             y2 = y1 - cart['diry']
 
             # Check for a crash
-            j = indexOfCartAtPos((x2, y2), carts)
+            j = indexOfCartAtPos((x2, y2), carts, crashed)
             if j > -1:
                 if not stopOnFirstCrash:
                     # Add these indexes to the list of crashed carts
