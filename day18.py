@@ -33,8 +33,9 @@ def getData():
 
 
 def simulate(grid, maxSteps):
-    # Only store the last 50, too many would ruin both memory- and time-performance
-    recentlySeen = deque(maxlen=50)
+    # The nature of the ruleset produces loops of 28 in length
+    loopLength = 28
+    recentlySeen = deque(maxlen=loopLength)
     repeating = False
     step = 0
     while not repeating and step < maxSteps:
@@ -53,22 +54,16 @@ def simulate(grid, maxSteps):
         grid = newGrid
 
         # Check for a repeating pattern
-        i = 0
-        while not repeating and i < len(recentlySeen):
-            if np.array_equal(recentlySeen[0], grid):
-                loopLength = len(recentlySeen) - i
-                loopStart = step - loopLength
+        if step > loopLength and np.array_equal(recentlySeen[0], grid):
+            loopStart = step - loopLength
 
-                # Calculate how far through the repeating loop the final grid appears
-                offset = (maxSteps - loopStart) % loopLength
+            # Calculate how far through the repeating loop the final grid appears
+            offset = (maxSteps - loopStart) % loopLength
 
-                # Use the offset to store what would be seen at step `maxSteps` in `grid`, this causes the output to print correctly
-                grid = recentlySeen[offset]
+            # Use the offset to store what would be seen at step `maxSteps` in `grid`, this causes the output to print correctly
+            grid = recentlySeen[offset]
 
-                repeating = True
-
-            recentlySeen.rotate(-1)
-            i += 1
+            repeating = True
 
         recentlySeen.append(grid)
 
