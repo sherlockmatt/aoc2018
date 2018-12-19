@@ -37,7 +37,7 @@ def simulate(ipr, instructions, registers):
             # This value is what gets stored in register 0, so shortcut the program and calculate it ourselves
             # We wait until something is written into register 0 - that means the program has started summing, i.e. the target number is ready
             # We don't know which register it's in, but it's the biggest value so we can work it out
-            answer = sum(divisors(sorted(registers)[-1]))
+            answer = sum(divisors(max(registers)))
 
     return answer
 
