@@ -9,3 +9,7 @@ def download(url):
         r.raise_for_status()
 
     return r
+
+
+def manhattan(x1, y1, x2, y2):
+    return abs(x1 - x2) + abs(y1 - y2)
