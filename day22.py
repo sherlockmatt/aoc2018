@@ -122,7 +122,7 @@ def puzzle2(grid, depth, target):
                     if minTravelTime[newY, newX, newEquipped] == 0 or newTime < minTravelTime[newY, newX, newEquipped]:
                         minTravelTime[newY, newX, newEquipped] = newTime
                         # Our f(n) heuristic is g(n) + manhattan distance, since this is an admissable heuristic for this problem
-                        openSet.put((newTime + manhattan(newX, newY, tx, ty), newX, newY, newEquipped))
+                        openSet.put((newTime + manhattan((newX, newY), (tx, ty)), newX, newY, newEquipped))
 
     # The target is always reached with the torch in hand
     print('Answer: {}'.format(minTravelTime[ty, tx, 1]))

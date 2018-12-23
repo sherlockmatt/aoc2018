@@ -11,5 +11,8 @@ def download(url):
     return r
 
 
-def manhattan(x1, y1, x2, y2):
-    return abs(x1 - x2) + abs(y1 - y2)
+def manhattan(point1, point2):
+    dist = 0
+    for axis in range(len(point1)):
+        dist += abs(point1[axis] - point2[axis])
+    return dist
